@@ -6,6 +6,7 @@ import com.champlain.enrollmentsservice.domainclientlayer.Students.StudentClient
 import com.champlain.enrollmentsservice.presentationlayer.enrollments.EnrollmentRequestModel;
 import com.champlain.enrollmentsservice.presentationlayer.enrollments.EnrollmentResponseModel;
 import com.champlain.enrollmentsservice.utils.exceptions.EntityModelUtil;
+import com.champlain.enrollmentsservice.utils.exceptions.NotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
@@ -32,6 +33,14 @@ public class EnrollmentServiceImpl implements EnrollmentService {
     }
 
     @Override
+    public Mono<EnrollmentResponseModel> getEnrollmentByEnrollmentId(String enrollmentId) {
+        return enrollmentRepository.findEnrollmentByEnrollmentId(enrollmentId)
+                .switchIfEmpty(Mono.defer(() -> Mono.error(new NotFoundException("Enrollment id not found: " + enrollmentId))))
+                .doOnNext(er -> log.debug("The enrollment entity is: " + er.toString()))
+                .map(EntityModelUtil::toEnrollmentResponseModel);
+    }
+
+    @Override
     public Mono<EnrollmentResponseModel> addEnrollment(Mono<EnrollmentRequestModel> enrollmentRequestModel) {
         return enrollmentRequestModel
                 .map(RequestContext::new)
@@ -39,6 +48,31 @@ public class EnrollmentServiceImpl implements EnrollmentService {
                 .flatMap(this::courseRequestResponse)
                 .map(EntityModelUtil::toEnrollmentEntity)
                 .flatMap(enrollmentRepository::save)
+                .map(EntityModelUtil::toEnrollmentResponseModel);
+    }
+
+    @Override
+    public Mono<EnrollmentResponseModel> updateEnrollmentByEnrollmentId(Mono<EnrollmentRequestModel> enrollmentRequestModel, String enrollmentId) {
+        return enrollmentRepository.findEnrollmentByEnrollmentId(enrollmentId)
+                .switchIfEmpty(Mono.defer(() -> Mono.error(new NotFoundException("Enrollment id not found: " + enrollmentId))))
+                .flatMap(found -> enrollmentRequestModel
+                        .map(RequestContext::new)
+                        .flatMap(this::studentRequestResponse)
+                        .flatMap(this::courseRequestResponse)
+                        .map(EntityModelUtil::toEnrollmentEntity)
+                        .doOnNext(e -> e.setCourseId(found.getCourseId()))
+                        .doOnNext(e -> e.setId(found.getId()))
+                )
+                .flatMap(enrollmentRepository::save)
+                .map(EntityModelUtil::toEnrollmentResponseModel);
+    }
+
+    @Override
+    public Mono<EnrollmentResponseModel> deleteEnrollmentByEnrollmentId(String enrollmentId) {
+        return enrollmentRepository.findEnrollmentByEnrollmentId(enrollmentId)
+                .switchIfEmpty(Mono.defer(() -> Mono.error(new NotFoundException("Enrollment id not found: " + enrollmentId))))
+                .flatMap(found -> enrollmentRepository.delete(found)
+                        .then(Mono.just(found)))
                 .map(EntityModelUtil::toEnrollmentResponseModel);
     }
 

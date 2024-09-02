@@ -8,5 +8,8 @@ import reactor.core.publisher.Mono;
 public interface EnrollmentService {
 
     Flux<EnrollmentResponseModel> getAllEnrollments();
+    Mono<EnrollmentResponseModel> getEnrollmentByEnrollmentId(String enrollmentId);
     Mono<EnrollmentResponseModel> addEnrollment(Mono<EnrollmentRequestModel> enrollmentRequestModel);
+    Mono<EnrollmentResponseModel> updateEnrollmentByEnrollmentId(Mono<EnrollmentRequestModel> enrollmentRequestModel, String enrollmentId);
+    Mono<EnrollmentResponseModel> deleteEnrollmentByEnrollmentId(String enrollmentId);
 }

@@ -27,7 +27,7 @@ public class CourseController {
     }
 
     //todo: getCourseByCourseId
-    @GetMapping(value = "/{courseId}", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    @GetMapping(value = "/{courseId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public Mono<ResponseEntity<CourseResponseModel>> getCourseByCourseId(@PathVariable String courseId) {
         return Mono.just(courseId) // creates a publisher
                 .filter(id -> id.length() == 36) // validate the course id
