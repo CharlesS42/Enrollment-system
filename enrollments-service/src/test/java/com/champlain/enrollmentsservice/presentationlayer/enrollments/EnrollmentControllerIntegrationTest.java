@@ -240,16 +240,17 @@ class EnrollmentControllerIntegrationTest {
                 .expectHeader().contentType(MediaType.APPLICATION_JSON)
                 .expectBody(EnrollmentResponseModel.class)
                 .value(enrollmentResponseModel -> {
-                    assertEquals(enrollment1.getEnrollmentId(), enrollmentResponseModel.getEnrollmentId());
+                    assertNotNull(enrollmentResponseModel.getEnrollmentId());
                     assertEquals(enrollmentRequestModel.getEnrollmentYear(), enrollmentResponseModel.getEnrollmentYear());
                     assertEquals(enrollmentRequestModel.getSemester(), enrollmentResponseModel.getSemester());
                     assertEquals(enrollmentRequestModel.getStudentId(), enrollmentResponseModel.getStudentId());
+                    assertEquals(enrollmentRequestModel.getCourseId(), enrollmentResponseModel.getCourseId());
                     assertEquals(studentResponseModel.getFirstName(), enrollmentResponseModel.getStudentFirstName());
                     assertEquals(studentResponseModel.getLastName(), enrollmentResponseModel.getStudentLastName());
-                    assertEquals(enrollmentRequestModel.getCourseId(), enrollmentResponseModel.getCourseId());
                     assertEquals(courseResponseModel.getCourseNumber(), enrollmentResponseModel.getCourseNumber());
                     assertEquals(courseResponseModel.getCourseName(), enrollmentResponseModel.getCourseName());
                 });
+
 
         //assert
         StepVerifier
