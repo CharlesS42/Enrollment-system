@@ -30,20 +30,26 @@ public class CourseClient {
         return webClient.get()
                 .uri("/{courseId}", courseId)
                 .retrieve()
-                .onStatus(HttpStatusCode::isError, httpErrorInfo ->
-                        httpErrorInfo.bodyToMono(HttpErrorInfo.class)
-                                .flatMap(error -> {
-                                    switch (httpErrorInfo.statusCode().value()){
-                                        case 404:
-                                            return Mono.error(new NotFoundException(error.getMessage()));
-                                        case 422:
-                                            return Mono.error(new InvalidInputException(error.getMessage()));
-                                        default:
-                                            return  Mono.error(new IllegalArgumentException(error.getMessage()));
-                                    }
-
-                                })
-                )
+//                .onStatus(HttpStatusCode::isError, httpErrorInfo ->
+//                        httpErrorInfo.bodyToMono(HttpErrorInfo.class)
+//                                .flatMap(error -> {
+//                                    switch (httpErrorInfo.statusCode().value()){
+//                                        case 404:
+//                                            return Mono.error(new NotFoundException(error.getMessage()));
+//                                        case 422:
+//                                            return Mono.error(new InvalidInputException(error.getMessage()));
+//                                        default:
+//                                            return  Mono.error(new IllegalArgumentException(error.getMessage()));
+//                                    }
+//
+//                                })
+//                )
+                .onStatus(HttpStatusCode::isError,
+                        error -> switch (error.statusCode().value()) {
+                            case 404 -> Mono.error(new NotFoundException("StudentId not found: " + courseId));
+                            case 422 -> Mono.error(new InvalidInputException("StudentId invalid: " + courseId));
+                            default -> Mono.error(new IllegalArgumentException("Something went wrong"));
+                        })
                 .bodyToMono(CourseResponseModel.class);
     }
 

@@ -1,0 +1,17 @@
+> Task :courses-service:clean
+> Task :enrollments-service:clean
+> Task :students-service:clean
+> Task :courses-service:processResources
+> Task :courses-service:processTestResources NO-SOURCE
+> Task :enrollments-service:processResources
+> Task :enrollments-service:processTestResources NO-SOURCE
+> Task :students-service:compileJava
+> Task :students-service:processResources
+> Task :students-service:classes
+> Task :students-service:resolveMainClassName
+> Task :students-service:bootJar FAILED
+> Task :courses-service:generateTestEffectiveLombokConfig
+> Task :courses-service:generateEffectiveLombokConfig
+> Task :enrollments-service:generateTestEffectiveLombokConfig
+> Task :enrollments-service:generateEffectiveLombokConfig
+13 actionable tasks: 13 executed
